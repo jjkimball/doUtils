@@ -1,0 +1,70 @@
+## End-to-end exercising.
+
+## Uses:
+## distroImages, makeDroplet, isUp, sshConn, do, put, get,
+## shutdownAllDroplets, myDroplets.
+
+## Note that this test destroys all droplets at the end.
+
+## Steps:
+##   source SETUP
+##   python
+##     import doctest
+##     doctest.testfile("exerciseDoUtilsAndSshConn.doctest")
+
+>>> import time, doUtils
+
+# We'll need the id of an image:
+>>> ubuntuImages = [img for img in doUtils.distroImages() if img[1] == 'Ubuntu']
+>>> id = ubuntuImages[0][0]
+
+# Make a droplet VPS, wait for it to come up:
+# (Note that network issues could cause this needed first
+# step to fail.)
+>>> dropletParms = doUtils.makeDroplet(id)
+>>> doUtils.isUp(dropletParms['ip address'], nTries=5)
+True
+
+# Make an ssh connection to the droplet:
+>>> sc = doUtils.SshConn(dropletParms['ip address'], 'adminutil', keyFname=dropletParms['pemFilePathname'])
+
+# Execute a command, get its output:
+>>> i,o,e = sc.do('pwd')
+>>> pwdOut = o.readlines()
+>>> pwdOut == ['/home/adminutil\n']
+True
+
+# Put a file to the droplet:
+>>> with open('test.txt', 'w') as f: print("testing testing", file=f)
+>>> sc.put('test.txt', 'test2.txt')    # doctest: +ELLIPSIS
+<SFTPAttributes:...
+
+# Check that the new file is there:
+>>> i,o,e = sc.do('ls')
+>>> lsOut = o.readlines()
+>>> lsOut == ['test2.txt\n']
+True
+
+# Get a file from the droplet:
+>>> sc.get('test2.txt', 'test2.txt')
+>>> with open('test2.txt', 'r') as f: contents = f.readlines()
+>>> contents == ['testing testing\n']
+True
+
+# Shut the droplet down:
+>>> doUtils.shutdownAllDroplets()    # doctest: +ELLIPSIS
+[...
+
+# And destroy it:
+## dropletParms['droplet'].destroy()
+# And destroy them:
+>>> doUtils.destroyAllDroplets()    # doctest: +ELLIPSIS
+[...
+
+
+# Check that it's gone.
+# TODO if there were other droplets hanging around, this fails
+>>> time.sleep(3)
+>>> ds = doUtils.myDroplets()
+>>> ds == []
+True
