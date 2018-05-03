@@ -35,19 +35,19 @@ True
 True
 
 # Put a file to the droplet:
->>> with open('test.txt', 'w') as f: print("testing testing", file=f)
->>> sc.put('test.txt', 'test2.txt')    # doctest: +ELLIPSIS
+>>> with open('_test.txt', 'w') as f: print("testing testing", file=f)
+>>> sc.put('_test.txt', '_test2.txt')    # doctest: +ELLIPSIS
 <SFTPAttributes:...
 
 # Check that the new file is there:
 >>> i,o,e = sc.do('ls')
 >>> lsOut = o.readlines()
->>> lsOut == ['test2.txt\n']
+>>> lsOut == ['_test2.txt\n']
 True
 
 # Get a file from the droplet:
->>> sc.get('test2.txt', 'test2.txt')
->>> with open('test2.txt', 'r') as f: contents = f.readlines()
+>>> sc.get('_test2.txt', '_test2.txt')
+>>> with open('_test2.txt', 'r') as f: contents = f.readlines()
 >>> contents == ['testing testing\n']
 True
 

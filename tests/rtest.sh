@@ -1,9 +1,12 @@
 #!/bin/bash
 
-PROJDIR=$HOME/pers/re/doUtils
 SECRETS=$HOME/.secrets/digital-ocean.env
-SRCDIR=$PROJDIR/src
-TESTSDIR=$PROJDIR/tests
+
+SCRIPTDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJDIR="$(cd "$SCRIPTDIR/../.." && pwd)"
+
+SRCDIR=$PROJDIR/repo
+TESTSDIR=$PROJDIR/repo/tests
 
 PY=$(fgrep -l doctest.testmod $(find $SRCDIR -iname '*.py'))
 EXER=$TESTSDIR/exercise*.doctest
