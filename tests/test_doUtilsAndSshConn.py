@@ -10,6 +10,7 @@ import doUtils
 
 logging.basicConfig(level=logging.INFO)
 
+
 def test_doUtilsAndSshConn():
 
     log = logging.getLogger('test_doUtilsAndSshConn')

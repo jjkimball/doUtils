@@ -158,7 +158,7 @@ def shutdownAllDroplets():
     droplets = myDroplets()
     stoppedOnes = []
     for d in droplets:
-        log.info("shutdown", d.id, "...")
+        log.info("shutdown {}...".format(d.id))
         d.shutdown()
         stoppedOnes.append(d.id)
     return stoppedOnes
