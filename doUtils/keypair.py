@@ -2,6 +2,7 @@
 
 import os
 import sys
+import logging
 import datetime
 import re
 import random
@@ -15,12 +16,18 @@ import random
 # ssh-add ~/.ssh/foo.pem
 # ssh-add -l
 
-
 # https://cryptography.io/en/latest/x509/tutorial/
 import cryptography
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
+
+###############################################################################
+
+ModuleName = __name__ if __name__ != '__main__' else os.path.basename(__file__)
+log = logging.getLogger(ModuleName)
+
+###############################################################################
 
 
 class Keypair():
@@ -73,7 +80,7 @@ if __name__ == '__main__':
         # 'THIS.py --unitTest' or 'THIS.py --unitTest -v'
         import doctest
         doctest.testmod()
-        print("//tests done", file=sys.stderr)
+        log.info("tests done")
     else:
         keypair = Keypair()
         keypair.writeToDisk()

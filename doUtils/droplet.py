@@ -4,6 +4,7 @@ import os
 import sys
 import time
 import socket
+import logging
 # import pdb
 import digitalocean
 import doUtils.utils
@@ -28,6 +29,11 @@ from doUtils.cloudConfig import makeUserData
 
 ###############################################################################
 
+ModuleName = __name__ if __name__ != '__main__' else os.path.basename(__file__)
+log = logging.getLogger(ModuleName)
+
+###############################################################################
+
 
 def isUp(ipAddr, port=22, nTries=3):
     '''
@@ -44,9 +50,9 @@ def isUp(ipAddr, port=22, nTries=3):
                 if res == 0:
                     return True    # port is open
                 else:
-                    print("//connect to {} failed, errno={} '{}' triesLeft={}".format(ipAddr, res, os.strerror(res), triesLeft), file=sys.stderr)
+                    log.info("connect to {} failed, errno={} '{}' triesLeft={}".format(ipAddr, res, os.strerror(res), triesLeft))
             except socket.timeout:
-                print("//socket timeout on connect to {} triesLeft={}".format(ipAddr, triesLeft), file=sys.stderr)
+                log.info("socket timeout on connect to {} triesLeft={}".format(ipAddr, triesLeft))
     return False
 
 ###############################################################################
@@ -119,15 +125,15 @@ def makeDroplet(imageID, sudoUserKeys=[], userData=None):
     keyIds = [k.doSshKey.id for k in sudoUserKeys]
     droplet = digitalocean.Droplet(token=doToken, name='dropletFromAPI02', region='sfo2', image=imageID, size_slug='512mb', backups=False, ssh_keys=keyIds, user_data=userData)
 
-    print("//create droplet...", file=sys.stderr)
+    log.info("create droplet...")
     droplet.create()
 
-    print("//awaiting actions...", file=sys.stderr)
+    log.info("awaiting actions...")
     actions = droplet.get_actions()
     actions[0].load()
-    print(actions, file=sys.stderr)
+    log.info(actions)
     actions[0].wait(10)  # ??
-    print(actions, file=sys.stderr)
+    log.info(actions)
 
     droplet.load()
     return {'ip address': droplet.ip_address,
@@ -152,7 +158,7 @@ def shutdownAllDroplets():
     droplets = myDroplets()
     stoppedOnes = []
     for d in droplets:
-        print("//shutdown", d.id, "...", file=sys.stderr)
+        log.info("shutdown", d.id, "...")
         d.shutdown()
         stoppedOnes.append(d.id)
     return stoppedOnes
@@ -171,7 +177,7 @@ def destroyAllDroplets():
     droplets = myDroplets()
     goneOnes = []
     for d in droplets:
-        print("//destroying", d.id, "...", file=sys.stderr)
+        log.info("destroying", d.id, "...")
         d.destroy()
         goneOnes.append(d.id)
     return goneOnes
@@ -184,7 +190,7 @@ if __name__ == "__main__":
         # 'THIS.py --unitTest' or 'THIS.py --unitTest -v'
         import doctest
         doctest.testmod()
-        print("//tests done", file=sys.stderr)
+        log.info("tests done")
 
 
 # - add non-root user w/ sudo

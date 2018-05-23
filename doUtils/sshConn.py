@@ -1,6 +1,15 @@
 #!/usr/bin/env python
 
+import os
+import logging
 import paramiko
+
+###############################################################################
+
+ModuleName = __name__ if __name__ != '__main__' else os.path.basename(__file__)
+log = logging.getLogger(ModuleName)
+
+###############################################################################
 
 
 class SshConn:

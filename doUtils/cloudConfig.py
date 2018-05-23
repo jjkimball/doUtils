@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
 import sys
+import os
 import time
+import logging
 import json
 import yaml
 import doUtils
@@ -9,6 +11,11 @@ import doUtils
 # TODO
 # makeUserData should accomodate multiple sudoable users
 
+
+###############################################################################
+
+ModuleName = __name__ if __name__ != '__main__' else os.path.basename(__file__)
+log = logging.getLogger(ModuleName)
 
 ###############################################################################
 # cloud config user_data (YAML)
@@ -117,11 +124,10 @@ def makeUserData(sudoUserKeys=[], customRepos=None, installPkgs=None, files=None
 ###############################################################################
 
 
-def waitUntilCloudInitDone(sshConn):
+def waitUntilCloudInitDone(sshConn, nTries=10):
     """
     Has cloud init finished running?
     """
-    nTries = 10
     triesLeft = nTries
     while triesLeft:
         time.sleep((nTries-triesLeft)**2)
@@ -132,7 +138,7 @@ def waitUntilCloudInitDone(sshConn):
         # (errLines and "No such file or directory" in errLines[0])
         _in, resOut, _err = sshConn.do('cat /run/cloud-init/result.json')
         if resOut.channel.recv_exit_status() != 0:
-            print("//Cloud init not done ({} tries left)...".format(triesLeft), file=sys.stderr)
+            log.info("Cloud init not done ({} tries left)...".format(triesLeft))
         else:
             resContents = resOut.read()
             _in, statOut, _err = sshConn.do('cat /run/cloud-init/status.json')
@@ -151,5 +157,5 @@ if __name__ == "__main__":
         # 'THIS.py --unitTest' or 'THIS.py --unitTest -v'
         import doctest
         doctest.testmod()
-        print("//tests done", file=sys.stderr)
+        log.info("tests done")
 

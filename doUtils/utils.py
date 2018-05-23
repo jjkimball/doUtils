@@ -2,6 +2,7 @@
 
 import os
 import sys
+import logging
 import digitalocean
 from doUtils.keypair import Keypair
 
@@ -11,6 +12,12 @@ from doUtils.keypair import Keypair
 #                      https://github.com/koalalorenzo/python-digitalocean
 
 ###############################################################################
+
+ModuleName = __name__ if __name__ != '__main__' else os.path.basename(__file__)
+log = logging.getLogger(ModuleName)
+
+###############################################################################
+
 
 
 class SshKeypair(Keypair):
