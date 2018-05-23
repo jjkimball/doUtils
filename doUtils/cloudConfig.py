@@ -70,15 +70,15 @@ RunCmdsCCTpl = {'runcmd': []}
 #       Another line is here.
 WriteFileCCTpl = {
     'write_files': [
-        {'path': None,
-         'content': None}
+        # {'path': None,
+        # 'content': None}
     ]
 }
 
 ###############################################################################
 
 
-def makeUserData(sudoUserKeys=[], customRepos=None, installPkgs=None):
+def makeUserData(sudoUserKeys=[], customRepos=None, installPkgs=None, files=None):
     """
     Create textual cloud-config user data for initializing a VPS.
     >>> udata,ukeys = makeUserData()
@@ -107,7 +107,10 @@ def makeUserData(sudoUserKeys=[], customRepos=None, installPkgs=None):
         installPackagesCC = dict(InstallPackagesCCTpl)
         installPackagesCC['packages'] = installPkgs
         ccParms.update(installPackagesCC)
-
+    if files:
+        writeFileCC = dict(WriteFileCCTpl)
+        writeFileCC['write_files'] = files
+        ccParms.update(writeFileCC)
     userData = CloudConfigHdr + yaml.dump(ccParms)
     return userData, sudoUserKeys
 
