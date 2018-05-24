@@ -43,7 +43,7 @@ def isUp(ipAddr, port=22, nTries=3):
         sock.settimeout(3)
         triesLeft = nTries
         while triesLeft:
-            time.sleep(nTries+1-triesLeft)
+            time.sleep((nTries-triesLeft)**2)
             triesLeft -= 1
             try:
                 res = sock.connect_ex((ipAddr, port))
@@ -177,10 +177,13 @@ def destroyAllDroplets():
     droplets = myDroplets()
     goneOnes = []
     for d in droplets:
-        log.info("destroying", d.id, "...")
+        log.info("destroying {}...".format(d.id))
         d.destroy()
         goneOnes.append(d.id)
     return goneOnes
+
+###############################################################################
+
 
 ###############################################################################
 
@@ -189,53 +192,7 @@ if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1].lower() == "--unittest":
         # 'THIS.py --unitTest' or 'THIS.py --unitTest -v'
         import doctest
+        logging.basicConfig(level=logging.INFO)    # default to stderr. alt: filename='unittest-{}.log'.format(ModuleName)
         doctest.testmod()
         log.info("tests done")
 
-
-# - add non-root user w/ sudo
-# then rm ssh priv fr/ root: chk /etc/ssh/sshd_config: PermitRootLogin change yes to no ; chk AllowUsers to permit new user ; service ssh restart
-
-# possibles, things to check:
-# ? sudo apt-get update && sudo apt-get upgrade
-# ?? sudo apt-get install curl
-# // sudo ufw status ; sudo ufw app list
-# /etc/php/7.0/fpm/php.ini -- set commented-out cgi.fix_pathinfo
-#  line to: cgi.fix_pathinfo=0
-#  then do: sudo systemctl restart php7.0-fpm
-# ? chk /etc/nginx/sites-available/default per
-#   https://www.digitalocean.com/community/tutorials/how-to-install-linux-nginx-mysql-php-lemp-stack-in-ubuntu-16-04
-# ? dns and mx?
-# ? ssl-cert?
-# ? password control to sections of nginx server?
-
-# dbox:
-# cd ~ ; curl -Lo dropbox-linux-x86_64.tar.gz https://www.dropbox.com/download?plat=lnx.x86_64
-# sudo mkdir -p /opt/dropbox ; sudo tar xzfv dropbox-linux-x86_64.tar.gz --strip 1 -C /opt/dropbox
-# interactive:  /opt/dropbox/dropboxd ; provides url must visit (in desktop) to link
-# ^C to quit server temply
-# can install as daemon "set up service script" https://www.digitalocean.com/community/tutorials/how-to-install-dropbox-client-as-a-service-on-ubuntu-14-04
-# cli:
-# cd ~ ; curl -LO https://www.dropbox.com/download?dl=packages/dropbox.py
-# chmod +x ~/dropbox.py ; ln -s /opt/dropbox ~/.dropbox-dist
-
-# vnc:
-# sudo apt install xfce4 xfce4-goodies tightvncserver
-# interactive: vncserver   to enter and verify a passwd and a view-only passwd
-#  (eg f/ demos)
-# config vnc server:  vncserver -kill :1 ; cp -p ~/.vnc/xstartup ~/.vnc/xstartup.ORIG ;
-# ~/.vnc/xstartup :
-#  #!/bin/bash
-#  xrdb $HOME/.Xresources
-#  startxfce4 &
-# sudo chmod +x ~/.vnc/xstartup ; vncserver
-# https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-vnc-on-ubuntu-16-04
-# for testing, for making a service
-
-#  - possible to (using normal keypair) launch a remote-use droplet?
-#    - what needed
-#      - dropbox
-#      - vnc?
-
-
-##droplet.shutdown()

@@ -23,7 +23,7 @@ def test_doUtilsAndSshConn():
     # (Note that network issues could cause this needed first
     # step to fail.)
     dParms = doUtils.makeDroplet(id)
-    isUp = doUtils.isUp(dParms['ip address'], nTries=5)
+    isUp = doUtils.isUp(dParms['ip address'], nTries=7)
     assert isUp
 
     log.info("make an ssh connection to the droplet...")

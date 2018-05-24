@@ -156,6 +156,7 @@ if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1].lower() == "--unittest":
         # 'THIS.py --unitTest' or 'THIS.py --unitTest -v'
         import doctest
+        logging.basicConfig(level=logging.INFO)    # default to stderr. alt: filename='unittest-{}.log'.format(ModuleName)
         doctest.testmod()
         log.info("tests done")
 

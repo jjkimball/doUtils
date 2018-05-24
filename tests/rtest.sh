@@ -8,13 +8,13 @@ PROJDIR="$(cd "$SCRIPTDIR/../.." && pwd)"
 SRCDIR=$PROJDIR/repo
 TESTSDIR=$PROJDIR/repo/tests
 
-PY=$(fgrep -l doctest.testmod $(find $SRCDIR -iname '*.py'))
-EXER=$TESTSDIR/exercise*.doctest
-TESTEES="$PY $EXER"
-
 export PYTHONPATH=$SRCDIR:$PYTHONPATH
-
 source $SECRETS
+
+SRCS=$(fgrep -l doctest.testmod $(find $SRCDIR -iname '*.py'))
+EXER=$(find $TESTSDIR -iname 'exercise*.doctest')
+PYTEST=$(find $TESTSDIR -iname 'test_*.py')
+TESTEES="$SRCS $EXER $PYTEST"
 
 case $1 in
     # No parms: default is process all test files
@@ -29,20 +29,20 @@ case $1 in
         ;;
 esac
 
-## echo //PYTHONPATH=$PYTHONPATH
-## echo //TESTEES=$TESTEES
-          
 for F in $TESTEES ; do
     echo ; echo ::::::::::::::::::::::::::::::::::::::::::::::::::
     echo ::: $F
     cd $(dirname $F)
     BF=$(basename $F)
     case "$F" in
+        */test_*.py ) pipenv run pytest -s $BF
+                    ;;
         *.py ) pipenv run ./$BF --unittest  || exit
                ;;
         *.doctest ) 
             pipenv run python -c "import doctest ; doctest.testfile('$BF', verbose=True)" ;;
     esac
 done
+
 
 echo //RTEST DONE
