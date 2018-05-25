@@ -44,7 +44,7 @@ class Keypair():
     """
 
     def __init__(self):
-        timestamp = "{:%Y%m%d_%H%M.%S}".format(datetime.datetime.now())
+        timestamp = "{:%Y%m%d_%H%M.%f}".format(datetime.datetime.now())
         self.name = "key" + timestamp + ".pem"
         # generate rsa key:
         self.key = rsa.generate_private_key(public_exponent=65537, key_size=2048, backend=default_backend())
@@ -75,7 +75,7 @@ class Keypair():
 
 
 ###############################################################################
-if __name__ == '__main__':
+if __name__ == '__main__':   # pragma: no cover
     if len(sys.argv) > 1 and sys.argv[1].lower() == "--unittest":
         # 'THIS.py --unitTest' or 'THIS.py --unitTest -v'
         import doctest
