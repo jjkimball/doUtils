@@ -1,6 +1,6 @@
 
 # End-to-end exercising.
-# Uses:
+# Exercises:
 #    distroImages, makeDroplet, isUp, sshConn, do, put, get,
 #    shutdownAllDroplets, myDroplets.
 

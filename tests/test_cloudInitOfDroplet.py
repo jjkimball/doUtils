@@ -1,5 +1,5 @@
 # Exercise cloud init of droplet
-# Uses:
+# Exercises:
 #    from doUtils: distroImages makeUserData makeDroplet isUp
 #    SshConn waitUntilCloudInitDone AllDroplets myDroplets
 

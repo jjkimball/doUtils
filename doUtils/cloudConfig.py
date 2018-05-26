@@ -11,6 +11,23 @@ import doUtils
 # TODO
 # makeUserData should accomodate multiple sudoable users
 
+###############################################################################
+# cloud config user_data (YAML)
+#
+# See:
+# https://www.digitalocean.com/community/tutorials/an-introduction-to-cloud-config-scripting
+# https://www.brightbox.com/docs/guides/cloud-init/
+# https://cloudinit.readthedocs.io/en/latest/topics/examples.html
+#
+# http://pyyaml.org/wiki/PyYAMLDocumentation
+# https://stackoverflow.com/questions/6866600/yaml-parsing-and-python
+#
+# Capabilities not yet scripted: Add custom trusted certs. Configure
+# resolv.conf's list of dns servers. Shutdown or reboot after
+# specified delay. Define group.  Change password. More.
+
+# Output of cloud config on the server gets written to standard output
+# and to the /var/log/cloud-init-output.log file
 
 ###############################################################################
 
@@ -18,22 +35,7 @@ ModuleName = __name__ if __name__ != '__main__' else os.path.basename(__file__)
 log = logging.getLogger(ModuleName)
 
 ###############################################################################
-# cloud config user_data (YAML)
-#
-# https://www.digitalocean.com/community/tutorials/an-introduction-to-cloud-config-scripting
-# https://www.brightbox.com/docs/guides/cloud-init/
-# https://cloudinit.readthedocs.io/en/latest/topics/examples.html
-#
-# http://pyyaml.org/wiki/PyYAMLDocumentation
-# https://stackoverflow.com/questions/6866600/yaml-parsing-and-python
-# pipenv install PyYAML
-#
-# also can:  add custom trusted certs. configure resolv.conf's list of
-# dns servers. shutdown or reboot after specified delay. define group.
-# change password. more.
-
-# output will be written to standard out and to
-# the /var/log/cloud-init-output.log file
+# Templates for building cloud config data structures:
 
 CloudConfigHdr = "#cloud-config\n"
 
@@ -88,10 +90,39 @@ WriteFileCCTpl = {
 def makeUserData(sudoUserKeys=[], customRepos=None, installPkgs=None, files=None):
     """
     Create textual cloud-config user data for initializing a VPS.
-    >>> udata,ukeys = makeUserData()
-    >>> "name: adminutil" in udata and "ssh-authorized-keys: [ssh-rsa " in udata
+
+    sudoUserKeys: List of users to be created with the ability to sudo.
+        List of one or more SshKeypairs (see Keypair.py). If
+        None provided, adds one for "adminuser".
+
+    CustomRepos: List of one or more custom repositories to fetch 
+        packages from
+
+    installPkgs: List of packages to install.
+
+    Files: List of files to be created.
+        Each is a {'path': "/path/to/file", 'content': "contents of file"}
+
+    EG: Default with no parameters is to create sudo user adminuser and no
+    custom packages installed or files created.
+    >>> udata1,ukeys1 = makeUserData()
+    >>> "name: adminutil" in udata1 and "ssh-authorized-keys: [ssh-rsa " in udata1
     True
-    >>> type(ukeys[0]) == doUtils.SshKeypair
+    >>> type(ukeys1[0]) == doUtils.SshKeypair
+    True
+
+    EG: Create a custom file, and install two special packages, one from
+    a custom repo.
+    >>> Repos = ['ppa:unit193/encryption']
+    >>> PkgsToInstall = ['build-essential', 'veracrypt']
+    >>> Lines = "Tis but a scratch.\\nA scratch? Your arm's off!\\n"
+    >>> FilesToCreate = [{'path': "/tmp/dialog.txt", 'content': Lines}]
+    >>> udata2,ukeys2 = makeUserData(customRepos=Repos, installPkgs=PkgsToInstall, files=FilesToCreate)
+    >>> "name: adminutil" in udata2
+    True
+    >>> type(ukeys2[0]) == doUtils.SshKeypair
+    True
+    >>> "\\nwrite_files:\\n- {content: 'Tis but a scratch.\\n" in udata2
     True
     """
     ccParms = {}
@@ -127,14 +158,20 @@ def makeUserData(sudoUserKeys=[], customRepos=None, installPkgs=None, files=None
 def waitUntilCloudInitDone(sshConn, nTries=10):
     """
     Has cloud init finished running?
+
+    sshConn: We need an ssh connection to the droplet (sshConn.py).
+
+    nTries: How many times to check. Number of seconds between checks
+        increases each time.
     """
     triesLeft = nTries
     while triesLeft:
         time.sleep((nTries-triesLeft)**2)
         triesLeft -= 1
+        # How do we know if cloud init is done, and whether it succeeded?
         # https://github.com/number5/cloud-init/blob/master/doc/status.txt
-        # Besides nonzero (ie fail) exit status from cat, could also do
-        # errLines = resErr.readlines(), and check for
+        # Besides checking for nonzero (ie fail) exit status from cat,
+        # could also do errLines = resErr.readlines(), and check for
         # (errLines and "No such file or directory" in errLines[0])
         _in, resOut, _err = sshConn.do('cat /run/cloud-init/result.json')
         if resOut.channel.recv_exit_status() != 0:
