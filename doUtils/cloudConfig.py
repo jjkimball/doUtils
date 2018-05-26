@@ -8,9 +8,6 @@ import json
 import yaml
 import doUtils
 
-# TODO
-# makeUserData should accomodate multiple sudoable users
-
 ###############################################################################
 # cloud config user_data (YAML)
 #
@@ -88,20 +85,19 @@ WriteFileCCTpl = {
 
 
 def makeUserData(sudoUserKeys=[], customRepos=None, installPkgs=None, files=None):
-    """
-    Create textual cloud-config user data for initializing a VPS.
+    """Create textual cloud-config user data for initializing a VPS.
 
-    sudoUserKeys: List of users to be created with the ability to sudo.
-        List of one or more SshKeypairs (see Keypair.py). If
+    sudoUserKeys -- List of users to be created with the ability to
+        sudo.  List of one or more SshKeypairs (see Keypair.py). If
         None provided, adds one for "adminuser".
 
-    CustomRepos: List of one or more custom repositories to fetch 
+    CustomRepos -- List of one or more custom repositories to fetch
         packages from
 
-    installPkgs: List of packages to install.
+    installPkgs -- List of packages to install.
 
-    Files: List of files to be created.
-        Each is a {'path': "/path/to/file", 'content': "contents of file"}
+    Files -- List of files to be created.  Each is a {'path':
+        "/path/to/file", 'content': "contents of file"}
 
     EG: Default with no parameters is to create sudo user adminuser and no
     custom packages installed or files created.
@@ -124,6 +120,7 @@ def makeUserData(sudoUserKeys=[], customRepos=None, installPkgs=None, files=None
     True
     >>> "\\nwrite_files:\\n- {content: 'Tis but a scratch.\\n" in udata2
     True
+
     """
     ccParms = {}
     if not sudoUserKeys:
@@ -156,13 +153,12 @@ def makeUserData(sudoUserKeys=[], customRepos=None, installPkgs=None, files=None
 
 
 def waitUntilCloudInitDone(sshConn, nTries=10):
-    """
-    Has cloud init finished running?
+    """Has cloud init finished running?
 
-    sshConn: We need an ssh connection to the droplet (sshConn.py).
+    sshConn -- We need an ssh connection to the droplet (sshConn.py).
 
-    nTries: How many times to check. Number of seconds between checks
-        increases each time.
+    nTries -- How many times to check. Number of seconds between
+        checks increases each time.
     """
     triesLeft = nTries
     while triesLeft:

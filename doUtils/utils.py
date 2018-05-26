@@ -6,10 +6,16 @@ import logging
 import digitalocean
 from doUtils.keypair import Keypair
 
-# API: https://developers.digitalocean.com/documentation/v2/
-#      https://developers.digitalocean.com/guides/
-# python-digitalocean: https://www.digitalocean.com/community/projects/python-digitalocean
-#                      https://github.com/koalalorenzo/python-digitalocean
+# Some useful utilities to support operations on a Digital Ocean
+# droplet (VPS).
+#
+# API:
+#    https://developers.digitalocean.com/documentation/v2/
+#    https://developers.digitalocean.com/guides/
+# python-digitalocean:
+#    https://www.digitalocean.com/community/projects/python-digitalocean
+#    https://github.com/koalalorenzo/python-digitalocean
+
 
 ###############################################################################
 
@@ -22,14 +28,19 @@ log = logging.getLogger(ModuleName)
 
 class SshKeypair(Keypair):
     """
-    SshKeypair is a rsa keypair, with the derived ssh key, and the username that owns the key.
+    SshKeypair is a rsa keypair, with the derived ssh key, and the
+    username that owns the key. This add some useful stuff to Keypair
+    for use with Digital Ocean droplets.
     """
 
     def __init__(self, username):
         """
+        Generate a keypair for the specified username.
+
         >>> key = SshKeypair('Bob')
         >>> key.username == 'Bob' and type(key.pemFilePathnameAsStr) == str and type(key.doSshKey) == digitalocean.SSHKey
         True
+
         """
         super(SshKeypair, self).__init__()
         self.writeToDisk(passPhrase="")
@@ -42,6 +53,8 @@ class SshKeypair(Keypair):
         self.doSshKey.create()
 
 ###############################################################################
+# API token stuff.
+
 # The environment variable DOTOKEN needs to be set to the user's
 # Digital Ocean API token:
 
@@ -53,9 +66,11 @@ class ApiTokenIsMissingError(Exception):
 def getApiToken():
     """
     Fetch the user's Digital Ocean API key from the environment.
+
     >>> doToken = getApiToken()
     >>> type(doToken) == str and len(doToken) == 64
     True
+
     """
     try:
         return getApiToken.apiKey
@@ -66,15 +81,16 @@ def getApiToken():
         except KeyError:
             raise ApiTokenIsMissingError
 
-###############################################################################        
-
+###############################################################################
 
 def getManager():
-    """
-    Get the manager object.
+    """Get the python-digitalocean manager object, so we can do
+    operations.
+
     >>> manager = getManager()
     >>> type(manager) == digitalocean.Manager
     True
+
     """
     try:
         return getManager.manager

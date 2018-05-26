@@ -10,22 +10,17 @@ import digitalocean
 import doUtils.utils
 from doUtils.cloudConfig import makeUserData
 
-# TODO
+# Operations on a Digital Ocean droplet (VPS).
 #
-# do('curl http://169.254.169.254/latest/user-data')
-# do('curl http://169.254.169.254/latest/meta-data')
+# These are just a slight increase in abstraction over what's already
+# in python-digitialocean.
 #
-# this now looks to be working:
-# makeDroplet(imageID, customRepos=['ppa:jonathonf/ffmpeg-3'], installPkgs=['ffmpeg', 'libav-tools', 'x264', 'x265'])
-# do('cat /var/log/cloud-init-output.log')
-#
-# block ssh to root not done?
-# other sec stuff
-
-# API: https://developers.digitalocean.com/documentation/v2/
-#      https://developers.digitalocean.com/guides/
-# python-digitalocean: https://www.digitalocean.com/community/projects/python-digitalocean
-#                      https://github.com/koalalorenzo/python-digitalocean
+# API:
+#    https://developers.digitalocean.com/documentation/v2/
+#    https://developers.digitalocean.com/guides/
+# python-digitalocean:
+#    https://www.digitalocean.com/community/projects/python-digitalocean
+#    https://github.com/koalalorenzo/python-digitalocean
 
 ###############################################################################
 
@@ -36,8 +31,12 @@ log = logging.getLogger(ModuleName)
 
 
 def isUp(ipAddr, port=22, nTries=3):
-    '''
-    Utility routine for scripting.  Waiting until a server is up.
+    '''Waiting until a server is up.
+
+    port -- The port to try to connect to.
+
+    nTries -- How many times to check. Number of seconds between
+        checks increases each time.
     '''
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.settimeout(3)
@@ -61,9 +60,11 @@ def isUp(ipAddr, port=22, nTries=3):
 def myDroplets():
     """
     Get a list of existing droplets (vps's).
+
     >>> droplets = myDroplets()
     >>> type(droplets) == list
     True
+
     """
     manager = doUtils.getManager()
     return manager.get_all_droplets()
@@ -72,9 +73,11 @@ def myDroplets():
 def myImages():
     """
     Get a list of existing custom images.
+
     >>> images = myImages()
     >>> type(images) == list
     True
+
     """
     manager = doUtils.getManager()
     return [(i.id, i.name) for i in manager.get_my_images()]
@@ -85,6 +88,7 @@ def appImages():
     Get a list of provided "app images" (images preconfigured
     for particular apps). We're interested in the id, the
     Linux distro, and the name (indicating the app).
+
     >>> appImages = appImages()
     >>> type(appImages) == list and len(appImages) > 0
     True
@@ -95,12 +99,15 @@ def appImages():
 
 def distroImages():
     """
+
     Get a list of provided "distro images" (images preconfigured for
     particular Linux distros). We're interested in the id, the distro,
     and the name (indicating the version and other particulars).
+
     >>> distroImages = distroImages()
     >>> type(distroImages) == list and len(distroImages) > 0
     True
+
     """
     manager = doUtils.getManager()
     return [(i. id, i.distribution, i.name) for i in manager.get_distro_images()]
@@ -110,7 +117,18 @@ def distroImages():
 
 def makeDroplet(imageID, sudoUserKeys=[], userData=None):
     """
+
     Create a running droplet.
+
+    imageID -- ID for the desired VPS image, eg from distroImages().
+
+    sudoUserKeys -- List of users to be created with the ability to
+        sudo.  List of one or more SshKeypairs (see Keypair.py). If
+        None provided, adds one for "adminuser".
+
+    userData -- startup user data for the VPS, eg for cloud-config.
+        May be created by makeUserData (see cloudConfig.py).
+
     >>> ubuntuImages = [img for img in distroImages() if img[1] == 'Ubuntu']
     >>> id = ubuntuImages[0][0]
     >>> dropletParms = makeDroplet(id)  # doctest: +ELLIPSIS
@@ -150,10 +168,12 @@ def makeDroplet(imageID, sudoUserKeys=[], userData=None):
 def shutdownAllDroplets():
     """
     Stop all droplets from running.
+
     >>> stoppees = shutdownAllDroplets()  # doctest: +ELLIPSIS
     ...
     >>> type(stoppees) == list
     True
+
     """
     droplets = myDroplets()
     stoppedOnes = []
@@ -168,11 +188,14 @@ def shutdownAllDroplets():
 
 def destroyAllDroplets():
     """
+
     Unrecoverably delete all droplets.
+
     >>> gone = destroyAllDroplets()  # doctest: +ELLIPSIS
     ...
     >>> type(gone) == list
     True
+
     """
     droplets = myDroplets()
     goneOnes = []
@@ -182,7 +205,7 @@ def destroyAllDroplets():
         goneOnes.append(d.id)
     return goneOnes
 
-###############################################################################
+
 
 
 ###############################################################################

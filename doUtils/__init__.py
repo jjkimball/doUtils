@@ -5,5 +5,3 @@ from doUtils.sshConn import SshConn    # SshConn: do, get, put
 
 from doUtils.utils import SshKeypair, getApiToken, getManager, ApiTokenIsMissingError
 
-# from doUtils.keypair import Keypair
-

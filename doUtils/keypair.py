@@ -7,16 +7,14 @@ import datetime
 import re
 import random
 
-# TODO
-#  unit tests for keypair
 
-## adding pem key to ssh lets us do 'ssh host' rather
-## than 'ssh -i /path/foo.pem host'
-# mv foo.pem ~/.ssh ; chmod 400 ~/.ssh/foo.pem
-# ssh-add ~/.ssh/foo.pem
-# ssh-add -l
-
+###############################################################################
+# class Keypair, to make an RSA keypair, eg for ssh. (See also class
+# SshKeypair in utils.py.)
+#
 # https://cryptography.io/en/latest/x509/tutorial/
+
+
 import cryptography
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
@@ -33,6 +31,7 @@ log = logging.getLogger(ModuleName)
 class Keypair():
     """
     Generate an RSA keypair.
+
     >>> kp = Keypair()
     >>> kp.name.endswith(".pem")
     True
@@ -41,6 +40,7 @@ class Keypair():
     >>> kp.writeToDisk()
     >>> kp.pemFilePathnameAsStr.endswith(".pem")
     True
+
     """
 
     def __init__(self):
@@ -48,14 +48,17 @@ class Keypair():
         self.name = "key" + timestamp + ".pem"
         # generate rsa key:
         self.key = rsa.generate_private_key(public_exponent=65537, key_size=2048, backend=default_backend())
-        # get handy serialized versions too:
+        # get handy serialized versions too.
         # public key in OpenSSH format:
         self.publicKeyOpensshAsBytes = self.key.public_key().public_bytes(serialization.Encoding.OpenSSH, serialization.PublicFormat.OpenSSH)
         # private key in PEM container format (with no passphrase):
         self.privateKeyPemAsBytes = self.key.private_bytes(encoding=serialization.Encoding.PEM, format=serialization.PrivateFormat.TraditionalOpenSSL, encryption_algorithm=serialization.NoEncryption())
-        # can decode AsBytes to AsStr (to printable string) via .decode('utf-8')
+        # Can decode AsBytes to AsStr (to printable string) via .decode('utf-8')
 
     def genPassphrase(self):
+        """
+        Make a passphrase, if none is specified.
+        """
         word_file = "/usr/share/dict/words"
         wordlist = open(word_file).read().splitlines()
         words = [random.SystemRandom().choice(wordlist) for _ in range(4)]
@@ -63,6 +66,17 @@ class Keypair():
         return " ".join(words)
 
     def writeToDisk(self, passPhrase="GENERATE", pemFilePathname=None):
+        """
+        Save the generated key to disk as a .pem file.
+
+        passPhrase -- Used to encrypt the file. Can be 'GENERATE', so
+            that a random one is generated.  Or can be '', in which
+            no encryption is used.  Or can be a user-chosen passphrase.
+
+        pemFilePathname -- Where to put the .pem file.  Defaults to
+        HOME/Downloads.
+
+        """
         self.pemFilePathnameAsStr = pemFilePathname or os.path.join(os.environ["HOME"], "Downloads", self.name)
         self.passphraseAsStr = self.genPassphrase() if passPhrase == "GENERATE" else passPhrase
         if self.passphraseAsStr == "":
