@@ -2,7 +2,7 @@
 
 """
 .. module:: doUtils.keypair
-   :platform: Unix, Windows
+   :platform: Unix
    :synopsis: class Keypair, to make an RSA keypair, eg for ssh. (See also class SshKeypair in utils.py.)
 
 .. moduleauthor:: John Kimball <jjkimball@acm.org>

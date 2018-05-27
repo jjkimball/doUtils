@@ -2,7 +2,7 @@
 
 """
 .. module:: doUtils.cloudConfig
-   :platform: Unix, Windows
+   :platform: Unix
    :synopsis: Configure a Digital Ocean droplet at startup using cloud-config and YAML.
 
 .. moduleauthor:: John Kimball <jjkimball@acm.org>

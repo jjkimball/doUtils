@@ -2,7 +2,7 @@
 
 """
 .. module:: doUtils.sshConn
-   :platform: Unix, Windows
+   :platform: Unix
    :synopsis: class SshConn -- an ssh connection.
 
 .. moduleauthor:: John Kimball <jjkimball@acm.org>

@@ -2,7 +2,7 @@
 
 """
 .. module:: doUtils.droplet
-   :platform: Unix, Windows
+   :platform: Unix
    :synopsis: Operations on a Digital Ocean droplet (VPS).
 
 .. moduleauthor:: John Kimball <jjkimball@acm.org>
