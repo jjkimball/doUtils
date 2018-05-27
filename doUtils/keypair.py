@@ -1,20 +1,25 @@
 #!/usr/bin/env python3
 
+"""
+.. module:: doUtils.keypair
+   :platform: Unix, Windows
+   :synopsis: class Keypair, to make an RSA keypair, eg for ssh. (See also class SshKeypair in utils.py.)
+
+.. moduleauthor:: John Kimball <jjkimball@acm.org>
+
+class Keypair, to make an RSA keypair, eg for ssh. (See also class SshKeypair in utils.py.)
+
+See:
+    * https://cryptography.io/en/latest/x509/tutorial/
+
+"""
+
 import os
 import sys
 import logging
 import datetime
 import re
 import random
-
-
-###############################################################################
-# class Keypair, to make an RSA keypair, eg for ssh. (See also class
-# SshKeypair in utils.py.)
-#
-# https://cryptography.io/en/latest/x509/tutorial/
-
-
 import cryptography
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization

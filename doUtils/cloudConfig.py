@@ -1,5 +1,36 @@
 #!/usr/bin/env python3
 
+"""
+.. module:: doUtils.cloudConfig
+   :platform: Unix, Windows
+   :synopsis: Configure a Digital Ocean droplet at startup using cloud-config and YAML.
+
+.. moduleauthor:: John Kimball <jjkimball@acm.org>
+
+Configure a Digital Ocean droplet at startup using cloud-config and YAML.
+
+See:
+
+    * https://www.digitalocean.com/community/tutorials/an-introduction-to-cloud-config-scripting
+    * https://www.brightbox.com/docs/guides/cloud-init/
+    * https://cloudinit.readthedocs.io/en/latest/topics/examples.html
+
+    * http://pyyaml.org/wiki/PyYAMLDocumentation
+    * https://stackoverflow.com/questions/6866600/yaml-parsing-and-python
+
+Further cloud-config capabilities not yet scripted here:
+
+    Add custom trusted certs. Configure
+    resolv.conf's list of dns servers. Shutdown or reboot after
+    specified delay. Define group.  Change password. More.
+
+Note:
+
+    Output of cloud config on the server gets written to standard output
+    and to the /var/log/cloud-init-output.log file.
+
+"""
+
 import sys
 import os
 import time
@@ -8,23 +39,8 @@ import json
 import yaml
 import doUtils
 
-###############################################################################
-# cloud config user_data (YAML)
-#
-# See:
-# https://www.digitalocean.com/community/tutorials/an-introduction-to-cloud-config-scripting
-# https://www.brightbox.com/docs/guides/cloud-init/
-# https://cloudinit.readthedocs.io/en/latest/topics/examples.html
-#
-# http://pyyaml.org/wiki/PyYAMLDocumentation
-# https://stackoverflow.com/questions/6866600/yaml-parsing-and-python
-#
-# Capabilities not yet scripted: Add custom trusted certs. Configure
-# resolv.conf's list of dns servers. Shutdown or reboot after
-# specified delay. Define group.  Change password. More.
 
-# Output of cloud config on the server gets written to standard output
-# and to the /var/log/cloud-init-output.log file
+
 
 ###############################################################################
 
@@ -106,7 +122,8 @@ def makeUserData(sudoUserKeys=[], customRepos=None, installPkgs=None, files=None
         Return userData string created, and list of sudoUserKeys used.
 
     EG: Default with no parameters is to create sudo user adminuser and no
-    custom packages installed or files created.
+    custom packages installed or files created:
+
     >>> udata1,ukeys1 = makeUserData()
     >>> "name: adminutil" in udata1 and "ssh-authorized-keys: [ssh-rsa " in udata1
     True
@@ -114,7 +131,8 @@ def makeUserData(sudoUserKeys=[], customRepos=None, installPkgs=None, files=None
     True
 
     EG: Create a custom file, and install two special packages, one from
-    a custom repo.
+    a custom repo:
+
     >>> Repos = ['ppa:unit193/encryption']
     >>> PkgsToInstall = ['build-essential', 'veracrypt']
     >>> Lines = "Tis but a scratch.\\nA scratch? Your arm's off!\\n"

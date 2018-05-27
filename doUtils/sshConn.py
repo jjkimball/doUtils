@@ -1,17 +1,27 @@
 #!/usr/bin/env python
 
+"""
+.. module:: doUtils.sshConn
+   :platform: Unix, Windows
+   :synopsis: class SshConn -- an ssh connection.
+
+.. moduleauthor:: John Kimball <jjkimball@acm.org>
+
+class SshConn -- an ssh connection.
+
+Wrap it up in an object to provide a bit higher level of abstraction
+than paramiko. (And a tiny subset thereof!)
+
+See:
+
+    * http://www.paramiko.org/
+    * https://gist.github.com/mlafeldt/841944 (paramiko examples)
+
+"""
+
 import os
 import logging
 import paramiko
-
-###############################################################################
-# class SshConn -- an ssh connection.
-#
-# Wrap it up in an object to provide a bit higher level of abstraction
-# than paramiko. (And a tiny subset thereof!)
-#
-#     http://www.paramiko.org/
-#     https://gist.github.com/mlafeldt/841944 (paramiko examples)
 
 ###############################################################################
 

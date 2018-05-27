@@ -1,21 +1,31 @@
 #!/usr/bin/env python3
 
+"""
+.. module:: doUtils.utils
+   :platform: Unix, Windows
+   :synopsis: Some useful utilities to support operations on a Digital Ocean droplet (VPS).
+
+.. moduleauthor:: John Kimball <jjkimball@acm.org>
+
+Some useful utilities to support operations on a Digital Ocean droplet (VPS).
+
+See:
+
+    * API:
+        * https://developers.digitalocean.com/documentation/v2/
+        * https://developers.digitalocean.com/guides/
+
+    * python-digitalocean:
+        * https://www.digitalocean.com/community/projects/python-digitalocean
+        * https://github.com/koalalorenzo/python-digitalocean
+
+"""
+
 import os
 import sys
 import logging
 import digitalocean
 from doUtils.keypair import Keypair
-
-# Some useful utilities to support operations on a Digital Ocean
-# droplet (VPS).
-#
-# API:
-#    https://developers.digitalocean.com/documentation/v2/
-#    https://developers.digitalocean.com/guides/
-# python-digitalocean:
-#    https://www.digitalocean.com/community/projects/python-digitalocean
-#    https://github.com/koalalorenzo/python-digitalocean
-
 
 ###############################################################################
 
@@ -23,7 +33,6 @@ ModuleName = __name__ if __name__ != '__main__' else os.path.basename(__file__)
 log = logging.getLogger(ModuleName)
 
 ###############################################################################
-
 
 
 class SshKeypair(Keypair):

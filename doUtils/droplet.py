@@ -1,5 +1,30 @@
 #!/usr/bin/env python3
 
+"""
+.. module:: doUtils.droplet
+   :platform: Unix, Windows
+   :synopsis: Operations on a Digital Ocean droplet (VPS).
+
+.. moduleauthor:: John Kimball <jjkimball@acm.org>
+
+Operations on a Digital Ocean droplet (VPS).
+
+These are just a slight increase in abstraction over what's already
+in python-digitialocean. (And a small subset thereof!)
+
+See:
+
+    * API:
+        * https://developers.digitalocean.com/documentation/v2/
+        * https://developers.digitalocean.com/guides/
+
+    * python-digitalocean:
+        * https://www.digitalocean.com/community/projects/python-digitalocean
+        * https://github.com/koalalorenzo/python-digitalocean
+        * https://digitalocean.readthedocs.io/en/latest/
+
+"""
+
 import os
 import sys
 import time
@@ -9,19 +34,6 @@ import logging
 import digitalocean
 import doUtils.utils
 from doUtils.cloudConfig import makeUserData
-
-# Operations on a Digital Ocean droplet (VPS).
-#
-# These are just a slight increase in abstraction over what's already
-# in python-digitialocean. (And a small subset thereof!)
-#
-# API:
-#    https://developers.digitalocean.com/documentation/v2/
-#    https://developers.digitalocean.com/guides/
-# python-digitalocean:
-#    https://www.digitalocean.com/community/projects/python-digitalocean
-#    https://github.com/koalalorenzo/python-digitalocean
-#    https://digitalocean.readthedocs.io/en/latest/
 
 ###############################################################################
 
