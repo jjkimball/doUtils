@@ -37,6 +37,8 @@ class SshKeypair(Keypair):
         """
         Generate a keypair for the specified username.
 
+        username : string
+
         >>> key = SshKeypair('Bob')
         >>> key.username == 'Bob' and type(key.pemFilePathnameAsStr) == str and type(key.doSshKey) == digitalocean.SSHKey
         True
@@ -67,6 +69,9 @@ def getApiToken():
     """
     Fetch the user's Digital Ocean API key from the environment.
 
+    Returns: string
+        The API key
+
     >>> doToken = getApiToken()
     >>> type(doToken) == str and len(doToken) == 64
     True
@@ -86,6 +91,8 @@ def getApiToken():
 def getManager():
     """Get the python-digitalocean manager object, so we can do
     operations.
+
+    Returns: Manager object (see python-digitalocean)
 
     >>> manager = getManager()
     >>> type(manager) == digitalocean.Manager

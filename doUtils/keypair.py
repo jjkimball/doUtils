@@ -58,6 +58,10 @@ class Keypair():
     def genPassphrase(self):
         """
         Make a passphrase, if none is specified.
+
+        Returns: string
+            Randomly chosen words, space-separated.
+
         """
         word_file = "/usr/share/dict/words"
         wordlist = open(word_file).read().splitlines()
@@ -66,15 +70,16 @@ class Keypair():
         return " ".join(words)
 
     def writeToDisk(self, passPhrase="GENERATE", pemFilePathname=None):
-        """
-        Save the generated key to disk as a .pem file.
+        """Save the generated key to disk as a .pem file.
 
-        passPhrase -- Used to encrypt the file. Can be 'GENERATE', so
-            that a random one is generated.  Or can be '', in which
-            no encryption is used.  Or can be a user-chosen passphrase.
+        passPhrase : string
+            Used to encrypt the file. Can be 'GENERATE', so that a
+            random one is generated.  Or can be '', in which no
+            encryption is used.  Or can be a user-chosen passphrase.
 
-        pemFilePathname -- Where to put the .pem file.  Defaults to
-        HOME/Downloads.
+        pemFilePathname : string
+            Where to put the .pem file.  Defaults to
+            HOME/Downloads.
 
         """
         self.pemFilePathnameAsStr = pemFilePathname or os.path.join(os.environ["HOME"], "Downloads", self.name)

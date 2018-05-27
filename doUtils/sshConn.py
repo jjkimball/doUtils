@@ -8,11 +8,10 @@ import paramiko
 # class SshConn -- an ssh connection.
 #
 # Wrap it up in an object to provide a bit higher level of abstraction
-# than paramiko.
+# than paramiko. (And a tiny subset thereof!)
 #
 #     http://www.paramiko.org/
 #     https://gist.github.com/mlafeldt/841944 (paramiko examples)
-
 
 ###############################################################################
 
@@ -34,15 +33,20 @@ class SshConn:
 
     def __init__(self, host, user, passwd=None, keyFname=None):
         """"
-        Create an ssh connection object.
-        
-        host -- the other end of the connection
+        Create an ssh connection object (including an sshClient
+        connection and an sftpClient connection).
 
-        user -- who to log in as
+        host : string
+            The other end of the connection
 
-        passwd -- password for the user, if needed
+        user : string
+            Who to log in as
 
-        keyFname -- an ssh key file, as an alternative to the
+        passwd : string
+            Password for the user, if needed
+
+        keyFname : string
+            An ssh key file, as an alternative to the
             password.
 
         """
@@ -63,10 +67,15 @@ class SshConn:
 
     def do(self, cmd, envDict=None):
         """"
-        Execute a shell command on the connected host, return
-        stdin, stdout, and stderr for the command.
+        Execute a shell command on the connected host.
 
-        envDict -- Dictionary of environment variables, if desired
+        cmd : string
+
+        envDict : dictionary
+             Dictionary of environment variables, if desired
+
+        Returns: tuple
+            3-tuple: stdin, stdout, and stderr for the command.
         """
         # Raises: SSHException – if the server fails to execute the command
         return self.sshClient.exec_command(cmd, environment=envDict)    # stdin, stdout, stderr
@@ -75,6 +84,9 @@ class SshConn:
         """"
         Get file at remoteFpath on the host at the other
         end of the connection, save it at localfPath locally.
+
+        remoteFpath : string
+        localFpath : string
         """
         return self.sftpClient.get(remoteFpath, localfPath)
 
@@ -82,6 +94,9 @@ class SshConn:
         """
         Put the file at localFpath on the local host, to the
         host at the other end of the connection, at remoteFpath.
+
+        localFpath : string
+        remoteFpath : string
         """
         return self.sftpClient.put(localFpath, remoteFpath)
 

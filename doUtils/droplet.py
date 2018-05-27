@@ -13,7 +13,7 @@ from doUtils.cloudConfig import makeUserData
 # Operations on a Digital Ocean droplet (VPS).
 #
 # These are just a slight increase in abstraction over what's already
-# in python-digitialocean.
+# in python-digitialocean. (And a small subset thereof!)
 #
 # API:
 #    https://developers.digitalocean.com/documentation/v2/
@@ -21,6 +21,7 @@ from doUtils.cloudConfig import makeUserData
 # python-digitalocean:
 #    https://www.digitalocean.com/community/projects/python-digitalocean
 #    https://github.com/koalalorenzo/python-digitalocean
+#    https://digitalocean.readthedocs.io/en/latest/
 
 ###############################################################################
 
@@ -33,10 +34,16 @@ log = logging.getLogger(ModuleName)
 def isUp(ipAddr, port=22, nTries=3):
     '''Waiting until a server is up.
 
-    port -- The port to try to connect to.
+    port : int
+        The port to try to connect to.
 
-    nTries -- How many times to check. Number of seconds between
-        checks increases each time.
+    nTries : int
+        How many times to check. Number of seconds between checks
+        increases each time.
+
+    Returns: bool
+        True if host is up before run out of nTries, else false.
+
     '''
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.settimeout(3)
@@ -61,6 +68,9 @@ def myDroplets():
     """
     Get a list of existing droplets (vps's).
 
+    Returns: list of Droplet objects (see python-digitalocean)
+        List of droplets existing in this account.
+
     >>> droplets = myDroplets()
     >>> type(droplets) == list
     True
@@ -74,6 +84,9 @@ def myImages():
     """
     Get a list of existing custom images.
 
+    Returns: list of Image objects (see python-digitalocean)
+        List of custom images in this account.
+
     >>> images = myImages()
     >>> type(images) == list
     True
@@ -84,25 +97,32 @@ def myImages():
 
 
 def appImages():
-    """
-    Get a list of provided "app images" (images preconfigured
-    for particular apps). We're interested in the id, the
-    Linux distro, and the name (indicating the app).
+    """Get a list of provided "app images" (images preconfigured
+    for particular apps). 
+
+    Returns : list of tuples (id, distribution, name)
+        Each tuple is three fields extracted from an Image object --
+        we're interested in the image id, the Linux distro, and the
+        name (indicating the app).
 
     >>> appImages = appImages()
     >>> type(appImages) == list and len(appImages) > 0
     True
+
     """
     manager = doUtils.getManager()
-    return [(i. id, i.distribution, i.name) for i in manager.get_app_images()]
+    return [(i.id, i.distribution, i.name) for i in manager.get_app_images()]
 
 
 def distroImages():
     """
-
     Get a list of provided "distro images" (images preconfigured for
-    particular Linux distros). We're interested in the id, the distro,
-    and the name (indicating the version and other particulars).
+    particular Linux distros).
+
+    Returns : list of tuples (id, distribution, name)
+        Each tuple is three fields extracted from an Image object --
+        we're interested in the image id, the Linux distro, and the
+        name  (indicating the version and other particulars).
 
     >>> distroImages = distroImages()
     >>> type(distroImages) == list and len(distroImages) > 0
@@ -116,18 +136,27 @@ def distroImages():
 
 
 def makeDroplet(imageID, sudoUserKeys=[], userData=None):
-    """
+    """Create a running droplet.
 
-    Create a running droplet.
+    imageID : string
+        ID for the desired VPS image, eg from distroImages().
 
-    imageID -- ID for the desired VPS image, eg from distroImages().
-
-    sudoUserKeys -- List of users to be created with the ability to
+    sudoUserKeys  : list of string
+        List of users to be created with the ability to
         sudo.  List of one or more SshKeypairs (see Keypair.py). If
         None provided, adds one for "adminuser".
 
-    userData -- startup user data for the VPS, eg for cloud-config.
+    userData : string
+        Startup user data for the VPS, eg for cloud-config.
         May be created by makeUserData (see cloudConfig.py).
+
+    Returns : dictionary
+        Dictionary has useful info about the created droplet: 'ip
+        address', username (associated with ssh key), keyname (of ssh
+        key), userData (used for cloud initialization),
+        pemFilePathname for the local key file, 'ssh command' to ssh
+        to the droplet, and droplet (Droplet object). All are strings
+        except for the last.
 
     >>> ubuntuImages = [img for img in distroImages() if img[1] == 'Ubuntu']
     >>> id = ubuntuImages[0][0]
@@ -135,6 +164,7 @@ def makeDroplet(imageID, sudoUserKeys=[], userData=None):
     ...
     >>> dropletParms['username'] == 'adminutil' and dropletParms['ssh command'].startswith('ssh -i')
     True
+
     """
 
     doToken = doUtils.getApiToken()
@@ -169,6 +199,9 @@ def shutdownAllDroplets():
     """
     Stop all droplets from running.
 
+    Returns : list of strings
+        List of IDs of stopped droplets
+
     >>> stoppees = shutdownAllDroplets()  # doctest: +ELLIPSIS
     ...
     >>> type(stoppees) == list
@@ -188,8 +221,10 @@ def shutdownAllDroplets():
 
 def destroyAllDroplets():
     """
-
     Unrecoverably delete all droplets.
+
+    Returns : list of strings
+        List of IDs of destroyed droplets
 
     >>> gone = destroyAllDroplets()  # doctest: +ELLIPSIS
     ...

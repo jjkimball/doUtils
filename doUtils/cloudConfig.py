@@ -87,17 +87,23 @@ WriteFileCCTpl = {
 def makeUserData(sudoUserKeys=[], customRepos=None, installPkgs=None, files=None):
     """Create textual cloud-config user data for initializing a VPS.
 
-    sudoUserKeys -- List of users to be created with the ability to
-        sudo.  List of one or more SshKeypairs (see Keypair.py). If
-        None provided, adds one for "adminuser".
+    sudoUserKeys : list of SshKeypairs (see utils.py and keypair.py)
+        List of users to be created with the ability to sudo.  If list
+        is empty, adds one for "adminuser".
 
-    CustomRepos -- List of one or more custom repositories to fetch
-        packages from
+    CustomRepos : list of string
+        List of one or more custom repositories to fetch
+        packages from.
 
-    installPkgs -- List of packages to install.
+    installPkgs : list of string
+        List of packages to install.
 
-    Files -- List of files to be created.  Each is a {'path':
-        "/path/to/file", 'content': "contents of file"}
+    Files : List of dicts {'path': "/path/to/file", 'content':
+        "contents of file"}
+        List of files to be created.
+
+    returns : string, list of SshKeypairs
+        Return userData string created, and list of sudoUserKeys used.
 
     EG: Default with no parameters is to create sudo user adminuser and no
     custom packages installed or files created.
@@ -155,10 +161,19 @@ def makeUserData(sudoUserKeys=[], customRepos=None, installPkgs=None, files=None
 def waitUntilCloudInitDone(sshConn, nTries=10):
     """Has cloud init finished running?
 
-    sshConn -- We need an ssh connection to the droplet (sshConn.py).
+    sshConn : SshConn object (see sshConn.py)
+        We need an ssh connection to the droplet (sshConn.py).
 
-    nTries -- How many times to check. Number of seconds between
+    nTries : int
+        How many times to check. Number of seconds between
         checks increases each time.
+
+    Returns : dict { 'done': bool, MORE }
+        If success, 'done' is True, and MORE is
+            'summaryResult': contents of /run/cloud-init/result.json
+            'passesResults': contents of /run/cloud-init/status.json
+        If failure, 'done' is False and MORE is
+            'log': contents of /var/log/cloud-init-output.log
     """
     triesLeft = nTries
     while triesLeft:
