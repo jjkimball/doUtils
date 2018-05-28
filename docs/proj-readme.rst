@@ -37,8 +37,10 @@ doUtils is a set of personal tools and a learning exercise. It's
 not (yet?) set up as a simple-to-install module.
 
 You can copy the doUtils folder somewhere on your system, and put that
-containing folder on your PYTHONPATH environment variable. Pipfile
-lists the prerequisite packages.
+containing folder on your PYTHONPATH environment variable. 
+The prerequisite packages are in requirements.txt.
+
+Note that you'll need a Digital Ocean API key -- see https://www.digitalocean.com/help/api/.
 
 To generate the docs, do::
 
