@@ -207,8 +207,12 @@ def waitUntilCloudInitDone(sshConn, nTries=10):
             log.info("Cloud init not done ({} tries left)...".format(triesLeft))
         else:
             resContents = resOut.read()
+            if type(resContents) == bytes:
+                resContents = resContents.decode('utf-8')
             _in, statOut, _err = sshConn.do('cat /run/cloud-init/status.json')
             statContents = statOut.read()
+            if type(statContents) == bytes:
+                statContents = statContents.decode('utf-8')
             return {'done': True, 'summaryResult': json.loads(resContents), 'phasesResults': json.loads(statContents)}
     _in, logOut, _err = sshConn.do('cat /var/log/cloud-init-output.log')
     logContents = logOut.readlines()
